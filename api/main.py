@@ -6,6 +6,7 @@ import schedule
 import time
 from datetime import datetime
 from flask import Flask
+import os
 
 app = Flask(__name__)
 
@@ -94,8 +95,7 @@ def log_event(action):
     print(f"Registrando {action} a las {now}")
     registro_sheet.append_row([action, now])
 
-@app.route('/api/run-schedule', methods=['POST'])
-def run_schedule():
+def update_schedule():
     encendido_times, apagado_times = get_times(sheet)
     
     # Limpia las programaciones anteriores
@@ -108,10 +108,19 @@ def run_schedule():
         else:
             print(f"Hora inválida detectada: Encendido = {encendido_times[i]}, Apagado = {apagado_times[i]}")
 
+@app.route('/api/run-schedule', methods=['POST'])
+def run_schedule():
+    update_schedule()
+
     while True:
         schedule.run_pending()
         time.sleep(10)  # Revisa cada 10 segundos si hay algo que hacer
 
+    return {"status": "success"}, 200
+
+@app.route('/api/update-schedule', methods=['POST'])
+def update_schedule_endpoint():
+    update_schedule()
     return {"status": "success"}, 200
 
 if __name__ == "__main__":
