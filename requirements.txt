@@ -1,0 +1,8 @@
+Flask
+gspread
+oauth2client
+schedule
+tuya_iot
+tuya_connector
+datetime
+time
